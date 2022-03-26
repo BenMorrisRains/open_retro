@@ -27,11 +27,11 @@ class _RetroColumnState extends State<RetroColumn> {
             IconButton(
                 onPressed: _showCardForColumn, icon: const Icon(Icons.add)),
             SizedBox(
-                width: 500,
-                height: 400,
+                width: 400,
+                height: 500,
                 child: ListView.builder(
                     itemCount: widget.cardList.length,
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(8.0),
                     itemBuilder: (context, i) {
                       // final index = i ~/ 2;
                       // if (i.isOdd) {
