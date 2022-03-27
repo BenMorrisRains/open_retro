@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RetroColumn extends StatefulWidget {
-  List<String> cardList = [""];
+  List<String> cardList = [];
 
   RetroColumn({Key? key}) : super(key: key);
 
@@ -78,11 +78,11 @@ class _RetroColumnState extends State<RetroColumn> {
                 child: MaterialButton(
                   onPressed: () {
                     debugPrint("save clicked");
-                      debugPrint(myController.text);
-                      setState(() {
-                        widget.cardList.add(myController.text);
-                      });
-                      debugPrint(widget.cardList[0]);
+                    debugPrint(myController.text);
+                    setState(() {
+                      widget.cardList.add(myController.text);
+                    });
+                    debugPrint(widget.cardList[0]);
                     Navigator.pop(context);
                   },
                   child: const Text("Save"),
@@ -95,11 +95,55 @@ class _RetroColumnState extends State<RetroColumn> {
 
   static const _biggerFont = TextStyle(fontSize: 18.0);
 
+  //key = index of card
+  //value = vote count
+  var cardsVoteMap = <int, int>{};
+
   Widget _buildRow(List<String> cardList, int index) {
-    return ListTile(
-      title: Text(
-        cardList[index],
-        style: _biggerFont,
+    if (cardsVoteMap[index] == null) {
+      cardsVoteMap[index] = 0;
+    }
+    return Card(
+      color: Colors.white60,
+      child: ListTile(
+        title: Text(
+          cardList[index],
+          style: _biggerFont,
+        ),
+        subtitle: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_upward),
+              onPressed: () {
+                var voteCount = cardsVoteMap[index];
+                if (voteCount == null) {
+                  voteCount = 0;
+                  setState(() {
+                    cardsVoteMap[index] = voteCount!;
+                  });
+                } else {
+                  voteCount++;
+                  setState(() {
+                    cardsVoteMap[index] = voteCount!;
+                  });
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_downward),
+              onPressed: () {
+                var voteCount = cardsVoteMap[index];
+                if (voteCount != null && voteCount > 0) {
+                  setState(() {
+                    voteCount = voteCount! - 1;
+                    cardsVoteMap[index] = voteCount!;
+                  });
+                }
+              },
+            ),
+            Text("Votes: " + cardsVoteMap[index].toString())
+          ],
+        ),
       ),
     );
   }
