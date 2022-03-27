@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 class RetroColumn extends StatefulWidget {
   List<String> cardList = [];
+  //key = index of card
+  //value = vote count
+  var cardsVoteMap = <int, int>{};
 
   RetroColumn({Key? key}) : super(key: key);
 
@@ -95,13 +98,9 @@ class _RetroColumnState extends State<RetroColumn> {
 
   static const _biggerFont = TextStyle(fontSize: 18.0);
 
-  //key = index of card
-  //value = vote count
-  var cardsVoteMap = <int, int>{};
-
   Widget _buildRow(List<String> cardList, int index) {
-    if (cardsVoteMap[index] == null) {
-      cardsVoteMap[index] = 0;
+    if (widget.cardsVoteMap[index] == null) {
+      widget.cardsVoteMap[index] = 0;
     }
     return Card(
       color: Colors.white60,
@@ -115,16 +114,16 @@ class _RetroColumnState extends State<RetroColumn> {
             IconButton(
               icon: const Icon(Icons.arrow_upward),
               onPressed: () {
-                var voteCount = cardsVoteMap[index];
+                var voteCount = widget.cardsVoteMap[index];
                 if (voteCount == null) {
                   voteCount = 0;
                   setState(() {
-                    cardsVoteMap[index] = voteCount!;
+                    widget.cardsVoteMap[index] = voteCount!;
                   });
                 } else {
                   voteCount++;
                   setState(() {
-                    cardsVoteMap[index] = voteCount!;
+                    widget.cardsVoteMap[index] = voteCount!;
                   });
                 }
               },
@@ -132,16 +131,16 @@ class _RetroColumnState extends State<RetroColumn> {
             IconButton(
               icon: const Icon(Icons.arrow_downward),
               onPressed: () {
-                var voteCount = cardsVoteMap[index];
+                var voteCount = widget.cardsVoteMap[index];
                 if (voteCount != null && voteCount > 0) {
                   setState(() {
                     voteCount = voteCount! - 1;
-                    cardsVoteMap[index] = voteCount!;
+                    widget.cardsVoteMap[index] = voteCount!;
                   });
                 }
               },
             ),
-            Text("Votes: " + cardsVoteMap[index].toString())
+            Text("Votes: " + widget.cardsVoteMap[index].toString())
           ],
         ),
       ),
