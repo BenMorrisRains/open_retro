@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:openretro/cardmodel.dart';
 
 class RetroColumn extends StatefulWidget {
-  List<String> cardList = [];
+  List<CardModel> cardList = [];
+
   //key = index of card
   //value = vote count
   var cardsVoteMap = <int, int>{};
@@ -36,10 +38,6 @@ class _RetroColumnState extends State<RetroColumn> {
                     itemCount: widget.cardList.length,
                     padding: const EdgeInsets.all(8.0),
                     itemBuilder: (context, i) {
-                      // final index = i ~/ 2;
-                      // if (i.isOdd) {
-                      //   return const Divider();
-                      // }
                       return _buildRow(widget.cardList, i);
                     }))
           ]),
@@ -55,94 +53,124 @@ class _RetroColumnState extends State<RetroColumn> {
   }
 
   Widget _addCardDialog() {
-    var myController = TextEditingController();
+    var titleController = TextEditingController();
+    var bodyTextController = TextEditingController();
     return Builder(builder: (context) {
       return Dialog(
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(3.0))),
-          elevation: 0,
+          elevation: 3,
           backgroundColor: Colors.white,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Text(
-                "Add Comment",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: myController,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  children: const [
+                    Text("Title:", style: _biggerFont,),
+                  ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: MaterialButton(
-                  onPressed: () {
-                    debugPrint("save clicked");
-                    debugPrint(myController.text);
-                    setState(() {
-                      widget.cardList.add(myController.text);
-                    });
-                    debugPrint(widget.cardList[0]);
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Save"),
+                TextField(
+                  controller: titleController,
                 ),
-              )
-            ],
+                Row(
+                  children: const [
+                    Text("Comment:", style: _biggerFont,),
+                  ],
+                ),
+                TextField(
+                  controller: bodyTextController,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: MaterialButton(
+                    color: Colors.white12,
+                    textColor: Colors.black45,
+                    onPressed: () {
+                      setState(() {
+                        widget.cardList.add(CardModel(
+                            titleController.text, bodyTextController.text));
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Save"),
+                  ),
+                )
+              ],
+            ),
           ));
     });
   }
 
-  static const _biggerFont = TextStyle(fontSize: 18.0);
+  static const _biggerFont = TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 
-  Widget _buildRow(List<String> cardList, int index) {
+  Widget _buildRow(List<CardModel> cardList, int index) {
     if (widget.cardsVoteMap[index] == null) {
       widget.cardsVoteMap[index] = 0;
     }
     return Card(
+      elevation: 3.0,
       color: Colors.white60,
-      child: ListTile(
-        title: Text(
-          cardList[index],
-          style: _biggerFont,
-        ),
-        subtitle: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_upward),
-              onPressed: () {
-                var voteCount = widget.cardsVoteMap[index];
-                if (voteCount == null) {
-                  voteCount = 0;
-                  setState(() {
-                    widget.cardsVoteMap[index] = voteCount!;
-                  });
-                } else {
-                  voteCount++;
-                  setState(() {
-                    widget.cardsVoteMap[index] = voteCount!;
-                  });
-                }
-              },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            tileColor: Colors.white60,
+            title:  Text(
+              cardList[index].title,
+              style: _biggerFont,
             ),
-            IconButton(
-              icon: const Icon(Icons.arrow_downward),
-              onPressed: () {
-                var voteCount = widget.cardsVoteMap[index];
-                if (voteCount != null && voteCount > 0) {
-                  setState(() {
-                    voteCount = voteCount! - 1;
-                    widget.cardsVoteMap[index] = voteCount!;
-                  });
-                }
-              },
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  cardList[index].body,
+                  style: const TextStyle(fontSize: 14.0, color: Colors.black),
+                ),
+              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Container(
+              color: Colors.white60,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_upward),
+                    onPressed: () {
+                      var voteCount = widget.cardsVoteMap[index];
+                      if (voteCount == null) {
+                        voteCount = 0;
+                        setState(() {
+                          widget.cardsVoteMap[index] = voteCount!;
+                        });
+                      } else {
+                        voteCount++;
+                        setState(() {
+                          widget.cardsVoteMap[index] = voteCount!;
+                        });
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_downward),
+                    onPressed: () {
+                      var voteCount = widget.cardsVoteMap[index];
+                      if (voteCount != null && voteCount > 0) {
+                        setState(() {
+                          voteCount = voteCount! - 1;
+                          widget.cardsVoteMap[index] = voteCount!;
+                        });
+                      }
+                    },
+                  ),
+                  Text("Votes: " + widget.cardsVoteMap[index].toString())
+                ],
+              ),
             ),
-            Text("Votes: " + widget.cardsVoteMap[index].toString())
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
