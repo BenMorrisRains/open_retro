@@ -1,23 +1,37 @@
 import 'dart:async';
+import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:openretro/column.dart';
+import 'package:openretro/columnTitles.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  var firstColumn = RetroColumn();
+  var secondColumn = RetroColumn();
+  var thirdColumn = RetroColumn();
+
+  HomePage({Key? key}) : super(key: key) {
+    var randomNumber = Random().nextInt(3);
+    var listOfColumnNames = <List<String>>[];
+    listOfColumnNames.add(ColumnTitles.GSM);
+    listOfColumnNames.add(ColumnTitles.HCS);
+    listOfColumnNames.add(ColumnTitles.SSC);
+
+    var randomList = listOfColumnNames[randomNumber];
+
+    firstColumn.columnTitle = randomList[0];
+    secondColumn.columnTitle = randomList[1];
+    thirdColumn.columnTitle = randomList[2];
+  }
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final firstColumn = RetroColumn();
-  final secondColumn = RetroColumn();
-  final thirdColumn = RetroColumn();
 
   var timerStarted = false;
+  int currentSeconds = 0;
 
   String get timerText =>
       '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: '
@@ -25,6 +39,8 @@ class _HomePageState extends State<HomePage> {
   final interval = const Duration(seconds: 1);
 
   final int timerMaxSeconds = 300;
+
+  Timer? timer;
 
   @override
   void initState() {
@@ -35,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Open Retro'),
+          title: Text("Open Retro", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),),
           actions: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -48,10 +64,20 @@ class _HomePageState extends State<HomePage> {
                       visible: timerStarted),
                   IconButton(
                       onPressed: () {
-                        setState(() {
-                          timerStarted = !timerStarted;
-                        });
-                        startTimeout();
+                        if (!timerStarted) {
+                          timer = startTimeout();
+                          timerStarted = true;
+                        } else {
+                          if (timer == null) {
+                            debugPrint("timer is null");
+                          }
+                          timer?.cancel();
+                          debugPrint("timer canceled");
+                          setState(() {
+                            timerStarted = false;
+                          });
+                          currentSeconds = 0;
+                        }
                       },
                       icon: const Icon(Icons.timer))
                 ],
@@ -59,30 +85,35 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: Container(
-          color: Colors.grey,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[firstColumn, secondColumn, thirdColumn],
+        body: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: widget.firstColumn,
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: widget.secondColumn,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: widget.thirdColumn,
+            ),
+          ],
         ));
   }
 
-  int currentSeconds = 0;
 
-  void startTimeout() {
-    Timer.periodic(interval, (timer) {
+  Timer startTimeout() {
+    return Timer.periodic(interval, (timer) {
       setState(() {
-        print(timer.tick);
         currentSeconds = timer.tick;
-        if (timer.tick >= timerMaxSeconds) timer.cancel();
+        if (timer.tick >= timerMaxSeconds) {
+          timer.cancel();
+        }
       });
-    });
+    },);
   }
 
   _dismissDialog() {
