@@ -39,31 +39,32 @@ final int timerMaxSeconds = 300;
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(2.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              TextField(
-                cursorColor: Colors.blueGrey,
-                style: const TextStyle(
-                    fontSize: 18.0, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-                controller: widget.columnTitleController,
-              ),
-              IconButton(
-                  onPressed: () {
-                    showCardForColumn(-1);
-                  },
-                  icon: const Icon(Icons.comment, size: 18.0,)),
-              SizedBox(
-                  width: 450,
-                  height: 600,
+        child: Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  cursorColor: Colors.blueGrey,
+                  style: const TextStyle(
+                      fontSize: 18.0, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                  controller: widget.columnTitleController,
+                ),
+                IconButton(
+                    onPressed: () {
+                      showCardForColumn(-1);
+                    },
+                    icon: const Icon(Icons.comment, size: 18.0,)),
+                Expanded(
                   child: ListView.builder(
                       shrinkWrap: true,
                       itemCount: widget.cardList.length,
                       itemBuilder: (context, i) {
                         return _buildRow(widget.cardList, i);
-                      }))
-            ]),
+                      }),
+                )
+              ]),
+        ),
       ),
     );
   }
