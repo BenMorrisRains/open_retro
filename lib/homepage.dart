@@ -85,22 +85,25 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: widget.firstColumn,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: widget.secondColumn,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: widget.thirdColumn,
-            ),
-          ],
+        body: Container(
+          color: Colors.black54,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: widget.firstColumn,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: widget.secondColumn,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: widget.thirdColumn,
+              ),
+            ],
+          ),
         ));
   }
 

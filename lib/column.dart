@@ -33,7 +33,8 @@ class _RetroColumnState extends State<RetroColumn> {
                   width: 400,
                   child: TextField(
                     cursorColor: Colors.blueGrey,
-                    style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18.0, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                     controller: widget.columnTitleController,
                   )),
@@ -67,7 +68,7 @@ class _RetroColumnState extends State<RetroColumn> {
     var summaryEmpty = false;
     return Builder(builder: (context) {
       return Dialog(
-        insetPadding: EdgeInsets.all(200),
+          insetPadding: EdgeInsets.all(200),
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(3.0))),
           elevation: 3,
@@ -78,6 +79,7 @@ class _RetroColumnState extends State<RetroColumn> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextField(
+                  maxLength: 30,
                     controller: titleController,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -89,10 +91,11 @@ class _RetroColumnState extends State<RetroColumn> {
                         maxLines: 5,
                         controller: bodyTextController,
                         decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: 'Add a brief summary:',
-                          errorText: summaryEmpty ? "Please add a brief summary." : null
-                        ))),
+                            border: const OutlineInputBorder(),
+                            labelText: 'Add a brief summary:',
+                            errorText: summaryEmpty
+                                ? "Please add a brief summary."
+                                : null))),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: MaterialButton(
@@ -124,69 +127,91 @@ class _RetroColumnState extends State<RetroColumn> {
   static const _biggerFont =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 
-  Widget _buildRow(List<CardModel> cardList, int index) {
+  void removeCard(int index) {
+    setState(() {
+      widget.cardList.removeAt(index);
+    });
+  }
 
+  Widget _buildRow(List<CardModel> cardList, int index) {
     if (widget.cardsVoteMap[index] == null) {
       widget.cardsVoteMap[index] = 0;
     }
 
     return Card(
       elevation: 3.0,
-      color: Colors.white60,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            tileColor: Colors.white60,
-            title: Text(
-              cardList[index].title,
-              style: _biggerFont,
+            tileColor: Colors.white38,
+            title: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      cardList[index].title,
+                      style: _biggerFont,
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.cancel),
+                        onPressed: () {
+                          removeCard(index);
+                        },
+                        color: Colors.black),
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+              ],
             ),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                cardList[index].body,
-                style: const TextStyle(fontSize: 14.0, color: Colors.black),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Container(
-              color: Colors.white60,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_upward),
-                    onPressed: () {
-                      var voteCount = widget.cardsVoteMap[index];
-                      if (voteCount == null) {
-                        voteCount = 0;
-                        setState(() {
-                          widget.cardsVoteMap[index] = voteCount!;
-                        });
-                      } else {
-                        voteCount++;
-                        setState(() {
-                          widget.cardsVoteMap[index] = voteCount!;
-                        });
-                      }
-                    },
+                  Text(
+                    cardList[index].body,
+                    style: const TextStyle(fontSize: 14.0, color: Colors.black),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.arrow_downward),
-                    onPressed: () {
-                      var voteCount = widget.cardsVoteMap[index];
-                      if (voteCount != null && voteCount > 0) {
-                        setState(() {
-                          voteCount = voteCount! - 1;
-                          widget.cardsVoteMap[index] = voteCount!;
-                        });
-                      }
-                    },
+                  const Padding(
+                    padding: EdgeInsets.only(top: 4.0),
+                    child: Divider(color: Colors.grey),
                   ),
-                  Text("Votes: " + widget.cardsVoteMap[index].toString())
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_upward),
+                        onPressed: () {
+                          var voteCount = widget.cardsVoteMap[index];
+                          if (voteCount == null) {
+                            voteCount = 0;
+                            setState(() {
+                              widget.cardsVoteMap[index] = voteCount!;
+                            });
+                          } else {
+                            voteCount++;
+                            setState(() {
+                              widget.cardsVoteMap[index] = voteCount!;
+                            });
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_downward),
+                        onPressed: () {
+                          var voteCount = widget.cardsVoteMap[index];
+                          if (voteCount != null && voteCount > 0) {
+                            setState(() {
+                              voteCount = voteCount! - 1;
+                              widget.cardsVoteMap[index] = voteCount!;
+                            });
+                          }
+                        },
+                      ),
+                      Text("Votes: " + widget.cardsVoteMap[index].toString())
+                    ],
+                  ),
                 ],
               ),
             ),
