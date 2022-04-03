@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:openretro/cardmodel.dart';
 
@@ -17,6 +19,19 @@ class RetroColumn extends StatefulWidget {
 }
 
 class _RetroColumnState extends State<RetroColumn> {
+  var timerStarted = false;
+  int currentSeconds = 0;
+
+final interval = const Duration(seconds: 1);
+
+final int timerMaxSeconds = 300;
+
+  Timer? timer;
+
+  String get timerText =>
+      '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: '
+      '${((timerMaxSeconds - currentSeconds) % 60).toString().padLeft(2, '0')}';
+
   @override
   Widget build(BuildContext context) {
     widget.columnTitleController.text = widget.columnTitle;
@@ -25,9 +40,6 @@ class _RetroColumnState extends State<RetroColumn> {
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Column(
-            // mainAxisAlignment: MainAxisAlignment.start,
-            // mainAxisSize: MainAxisSize.max,
-            // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               SizedBox(
                   width: 400,
@@ -62,6 +74,14 @@ class _RetroColumnState extends State<RetroColumn> {
         context: context,
         builder: (context) {
           return _addCardDialog(index);
+        });
+  }
+
+  void showCardForDiscussion(int index) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return cardForDiscussion(index);
         });
   }
 
@@ -127,7 +147,7 @@ class _RetroColumnState extends State<RetroColumn> {
                       } else {
                         summaryEmpty = false;
                         if (editingCard) {
-                          removeCard(index);
+                          removeCard(index, true);
                         }
                         setState(() {
                           widget.cardList.add(CardModel(
@@ -145,12 +165,71 @@ class _RetroColumnState extends State<RetroColumn> {
     });
   }
 
+  Timer startTimeout() {
+    return Timer.periodic(interval, (timer) {
+      setState(() {
+        currentSeconds = timer.tick;
+        if (timer.tick >= timerMaxSeconds) {
+          timer.cancel();
+        }
+      });
+    },);
+  }
+
+  Widget cardForDiscussion(int index) {
+    var textForTitle = "";
+    var textForBody = "";
+
+    if (index != -1) {
+      textForTitle = widget.cardList[index].title;
+      textForBody = widget.cardList[index].body;
+    }
+      return Dialog(
+          insetPadding: EdgeInsets.all(200),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(3.0))),
+          elevation: 3,
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(timerText),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(textForTitle, style: _cardTitleFont,),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: Text(textForBody)),
+                  ],
+                ),
+              ],
+            ),
+          ));
+    }
+
+
   static const _biggerFont =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
   static const _cardTitleFont =
       TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold);
 
-  void removeCard(int index) {
+  void removeCard(int index, bool edit) {
+    if (!edit) {
+      widget.cardsVoteMap[index] = 0;
+    }
     setState(() {
       widget.cardList.removeAt(index);
     });
@@ -194,7 +273,7 @@ class _RetroColumnState extends State<RetroColumn> {
                               size: 14.0,
                             ),
                             onPressed: () {
-                              removeCard(index);
+                              removeCard(index, false);
                             },
                             color: Colors.black)
                       ],
@@ -217,8 +296,14 @@ class _RetroColumnState extends State<RetroColumn> {
                     child: Divider(color: Colors.grey),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      IconButton(
+                          onPressed: () {
+                            showCardForDiscussion(index);
+                            startTimeout();
+                          },
+                          icon: Icon(Icons.people_alt_outlined)),
                       IconButton(
                         icon: const Icon(Icons.arrow_upward),
                         onPressed: () {
