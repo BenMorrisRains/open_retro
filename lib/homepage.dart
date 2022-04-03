@@ -29,13 +29,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   var timerStarted = false;
   int currentSeconds = 0;
 
   String get timerText =>
       '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: '
       '${((timerMaxSeconds - currentSeconds) % 60).toString().padLeft(2, '0')}';
+
   final interval = const Duration(seconds: 1);
 
   final int timerMaxSeconds = 300;
@@ -51,7 +51,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Open Retro", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),),
+          title: Text(
+            "Open Retro",
+            style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          ),
           actions: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -87,36 +90,42 @@ class _HomePageState extends State<HomePage> {
         ),
         body: Container(
           color: Colors.black54,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: widget.firstColumn,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: widget.secondColumn,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: widget.thirdColumn,
-              ),
-            ],
+          child: Center(
+            child: ListView(
+              shrinkWrap: true,
+              itemExtent: 478,
+              scrollDirection: Axis.horizontal,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: widget.firstColumn,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: widget.secondColumn,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: widget.thirdColumn,
+                ),
+              ],
+            ),
           ),
         ));
   }
 
-
   Timer startTimeout() {
-    return Timer.periodic(interval, (timer) {
-      setState(() {
-        currentSeconds = timer.tick;
-        if (timer.tick >= timerMaxSeconds) {
-          timer.cancel();
-        }
-      });
-    },);
+    return Timer.periodic(
+      interval,
+      (timer) {
+        setState(() {
+          currentSeconds = timer.tick;
+          if (timer.tick >= timerMaxSeconds) {
+            timer.cancel();
+          }
+        });
+      },
+    );
   }
 
   _dismissDialog() {

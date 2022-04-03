@@ -40,27 +40,26 @@ final int timerMaxSeconds = 300;
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Column(
+          mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              SizedBox(
-                  width: 400,
-                  child: TextField(
-                    cursorColor: Colors.blueGrey,
-                    style: const TextStyle(
-                        fontSize: 18.0, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                    controller: widget.columnTitleController,
-                  )),
+              TextField(
+                cursorColor: Colors.blueGrey,
+                style: const TextStyle(
+                    fontSize: 18.0, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+                controller: widget.columnTitleController,
+              ),
               IconButton(
                   onPressed: () {
                     showCardForColumn(-1);
                   },
-                  icon: const Icon(Icons.add)),
+                  icon: const Icon(Icons.comment, size: 18.0,)),
               SizedBox(
-                  width: 400,
-                  height: 500,
+                  width: 450,
+                  height: 600,
                   child: ListView.builder(
+                      shrinkWrap: true,
                       itemCount: widget.cardList.length,
-                      padding: const EdgeInsets.all(2.0),
                       itemBuilder: (context, i) {
                         return _buildRow(widget.cardList, i);
                       }))
