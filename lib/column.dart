@@ -23,7 +23,7 @@ class _RetroColumnState extends State<RetroColumn> {
     return Container(
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(2.0),
         child: Column(
             // mainAxisAlignment: MainAxisAlignment.start,
             // mainAxisSize: MainAxisSize.max,
@@ -39,13 +39,16 @@ class _RetroColumnState extends State<RetroColumn> {
                     controller: widget.columnTitleController,
                   )),
               IconButton(
-                  onPressed: _showCardForColumn, icon: const Icon(Icons.add)),
+                  onPressed: () {
+                    showCardForColumn(-1);
+                  },
+                  icon: const Icon(Icons.add)),
               SizedBox(
                   width: 400,
                   height: 500,
                   child: ListView.builder(
                       itemCount: widget.cardList.length,
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(2.0),
                       itemBuilder: (context, i) {
                         return _buildRow(widget.cardList, i);
                       }))
@@ -54,18 +57,33 @@ class _RetroColumnState extends State<RetroColumn> {
     );
   }
 
-  void _showCardForColumn() {
+  void showCardForColumn(int index) {
     showDialog(
         context: context,
         builder: (context) {
-          return _addCardDialog();
+          return _addCardDialog(index);
         });
   }
 
-  Widget _addCardDialog() {
+  Widget _addCardDialog(int index) {
     var titleController = TextEditingController();
     var bodyTextController = TextEditingController();
     var summaryEmpty = false;
+
+    var textForTitle = "";
+    var textForBody = "";
+
+    var editingCard = false;
+
+    if (index != -1) {
+      textForTitle = widget.cardList[index].title;
+      textForBody = widget.cardList[index].body;
+      titleController.text = textForTitle;
+      bodyTextController.text = textForBody;
+
+      editingCard = true;
+    }
+
     return Builder(builder: (context) {
       return Dialog(
           insetPadding: EdgeInsets.all(200),
@@ -79,7 +97,7 @@ class _RetroColumnState extends State<RetroColumn> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextField(
-                  maxLength: 30,
+                    maxLength: 30,
                     controller: titleController,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -108,6 +126,9 @@ class _RetroColumnState extends State<RetroColumn> {
                         });
                       } else {
                         summaryEmpty = false;
+                        if (editingCard) {
+                          removeCard(index);
+                        }
                         setState(() {
                           widget.cardList.add(CardModel(
                               titleController.text, bodyTextController.text));
@@ -126,6 +147,8 @@ class _RetroColumnState extends State<RetroColumn> {
 
   static const _biggerFont =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
+  static const _cardTitleFont =
+      TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold);
 
   void removeCard(int index) {
     setState(() {
@@ -148,19 +171,35 @@ class _RetroColumnState extends State<RetroColumn> {
             title: Column(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       cardList[index].title,
-                      style: _biggerFont,
+                      style: _cardTitleFont,
                     ),
-                    IconButton(
-                        icon: Icon(Icons.cancel),
-                        onPressed: () {
-                          removeCard(index);
-                        },
-                        color: Colors.black),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              showCardForColumn(index);
+                            },
+                            icon: const Icon(
+                              IconData(0xe21a, fontFamily: 'MaterialIcons'),
+                              size: 14.0,
+                            )),
+                        IconButton(
+                            icon: const Icon(
+                              Icons.cancel,
+                              size: 14.0,
+                            ),
+                            onPressed: () {
+                              removeCard(index);
+                            },
+                            color: Colors.black)
+                      ],
+                    ),
                   ],
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 ),
               ],
             ),
