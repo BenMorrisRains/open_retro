@@ -136,9 +136,12 @@ final int timerMaxSeconds = 300;
                                 : null))),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: MaterialButton(
-                    color: Colors.white12,
-                    textColor: Colors.black45,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.white),
+                      primary: Colors.greenAccent,
+                      elevation: 7
+                    ),
                     onPressed: () {
                       if (bodyTextController.text.isEmpty) {
                         setState(() {
@@ -156,7 +159,7 @@ final int timerMaxSeconds = 300;
                         Navigator.pop(context);
                       }
                     },
-                    child: const Text("Save"),
+                    child: const Text("Add Card"),
                   ),
                 )
               ],
